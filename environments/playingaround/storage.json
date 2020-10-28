@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sku": {
+      "type": "string",
+      "defaultValue": "Standard_LRS"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "locationUs": "eastus2",
+    "locationCan": "eastus2",
+    "canadaApproved": true,
+    "namePrefix": "cuu"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2019-06-01",
+      "name": "[format('{0}testbicepstorage', variables('namePrefix'))]",
+      "location": "[if(variables('canadaApproved'), variables('locationCan'), variables('locationUs'))]",
+      "kind": "Storage",
+      "sku": {
+        "name": "[parameters('sku')]"
+      }
+    }
+  ],
+  "outputs": {
+    "storageId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Storage/storageAccounts', format('{0}testbicepstorage', variables('namePrefix')))]"
+    },
+    "blobEndpoint": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', format('{0}testbicepstorage', variables('namePrefix')))).primaryEndpoints.blob]"
+    }
+  }
+}
