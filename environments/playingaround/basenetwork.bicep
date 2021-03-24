@@ -34,6 +34,22 @@ resource bicepnsg 'Microsoft.Network/networkSecurityGroups@2020-08-01' = {
   }
 }
 
+resource biceprt 'Microsoft.Network/routeTables@2020-08-01' = {
+  name: 'biceprt'
+  location: location
+  properties: {
+    routes: [
+      {
+        name: 'defaultroute'
+        properties: {
+          addressPrefix: '0.0.0.0/0'
+          nextHopType: 'Internet'
+        }
+      }
+    ]   
+  }
+}
+
 resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
 
   name: 'biceptestvnet3/biceptestsubnet'
@@ -45,6 +61,8 @@ resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
     networkSecurityGroup:{
       id: bicepnsg.id
     }
-
+    routeTable: {
+      id: biceprt.id
+    }
   }
 }
