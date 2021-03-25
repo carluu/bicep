@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "type": "string"
+    },
+    "nsgId": {
+      "type": "string"
+    },
+    "rtId": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "addrSpace": "10.1.0.0/28",
+    "location": "eastus2"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2020-08-01",
+      "name": "[format('{0}/biceptestsubnet1', parameters('vnetName'))]",
+      "properties": {
+        "addressPrefix": "[variables('addrSpace')]",
+        "networkSecurityGroup": {
+          "id": "[parameters('nsgId')]"
+        },
+        "routeTable": {
+          "id": "[parameters('rtId')]"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.1.62928",
+      "templateHash": "8401130297393130529"
+    }
+  }
+}
