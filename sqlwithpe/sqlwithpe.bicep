@@ -18,6 +18,7 @@ resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(
   name: '${testVnet.name}/${nameModifier}fwsubnet'
   properties: {
     addressPrefix: '10.0.0.0/24'
+    privateEndpointNetworkPolicies: 'Disabled'
   }
 }
 
@@ -28,6 +29,17 @@ resource testPeForSql 'Microsoft.Network/privateEndpoints@2020-11-01' = {
     subnet: {
       id: testSubnet.id
     }
+    privateLinkServiceConnections: [
+      {
+        name: '${nameModifier}-pe'
+        properties: {
+          privateLinkServiceId: testSql.id
+          groupIds: [
+            'sqlServer'
+          ]
+        }
+      }
+    ]
   }
 }
 
@@ -39,12 +51,20 @@ resource testSql 'Microsoft.Sql/servers@2020-11-01-preview' = {
       administratorLoginPassword: adminPassword
       publicNetworkAccess: 'Disabled'
   }
-  resource testSqlPEC 'privateEndpointConnections@2020-11-01-preview' = {
-    name: '${nameModifier}-sqlpec'
-    properties: {
-      privateEndpoint: {
-        id: testPeForSql.id
-      }
+}
+
+/*
+resource testSqlPEC 'Microsoft.Sql/servers/privateEndpointConnections@2020-11-01-preview' = {
+  name: '${testSql.name}/sqlpec'
+  properties: {
+    privateEndpoint: {
+      id: testPeForSql.id
+    }
+    privateLinkServiceConnectionState: {
+      
     }
   }
-}
+  dependsOn: [
+    testSql
+  ]
+}*/

@@ -1,7 +1,7 @@
-var nameModifier = 'cuuwindowsase'
-var deployVnet = false
+param nameModifier string = 'cuubc'
+param subnetId string = 'nullid'
 
-resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(deployVnet){
+resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(subnetId == ''){
   name: '${nameModifier}-vnet'
   location: resourceGroup().location
   properties: {
@@ -13,7 +13,7 @@ resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(deployVnet
   }
 }
 
-resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(deployVnet){
+resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(subnetId == ''){
   name: '${testVnet.name}/${nameModifier}asesubnet'
   properties: {
     addressPrefix: '10.0.0.0/24'
@@ -29,7 +29,7 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2020-10-01' = {
     internalLoadBalancingMode:'None'
     location: resourceGroup().location
     virtualNetwork: {
-      id: testSubnet.id
+      id: '${subnetId == '' ? testSubnet.id : subnetId}'
     }
     workerPools: [
       {
@@ -59,4 +59,6 @@ resource testAsp 'Microsoft.Web/serverfarms@2020-10-01' = {
     reserved: false
   }
 }
+
+output asefqdn string = testAse.properties.dnsSuffix
 

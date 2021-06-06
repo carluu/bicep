@@ -1,0 +1,101 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminPassword": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "nameModifier": "sqlwithpe",
+    "deployVnet": true
+  },
+  "resources": [
+    {
+      "condition": "[variables('deployVnet')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-08-01",
+      "name": "[format('{0}-vnet', variables('nameModifier'))]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/8"
+          ]
+        }
+      }
+    },
+    {
+      "condition": "[variables('deployVnet')]",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2020-08-01",
+      "name": "[format('{0}/{1}fwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier'))]",
+      "properties": {
+        "addressPrefix": "10.0.0.0/24",
+        "privateEndpointNetworkPolicies": "Disabled"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', variables('nameModifier')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/privateEndpoints",
+      "apiVersion": "2020-11-01",
+      "name": "[format('{0}-pe', variables('nameModifier'))]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "subnet": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}fwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[0], split(format('{0}/{1}fwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[1])]"
+        },
+        "privateLinkServiceConnections": [
+          {
+            "name": "[format('{0}-pe', variables('nameModifier'))]",
+            "properties": {
+              "privateLinkServiceId": "[resourceId('Microsoft.Sql/servers', format('{0}-sql', variables('nameModifier')))]",
+              "groupIds": [
+                "sqlServer"
+              ]
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', format('{0}-sql', variables('nameModifier')))]",
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}fwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[0], split(format('{0}/{1}fwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[1])]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2020-11-01-preview",
+      "name": "[format('{0}-sql', variables('nameModifier'))]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "administratorLogin": "testpeadmin",
+        "administratorLoginPassword": "[parameters('adminPassword')]",
+        "publicNetworkAccess": "Disabled"
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/privateEndpointConnections",
+      "apiVersion": "2020-11-01-preview",
+      "name": "[format('{0}/sqlpec', format('{0}-sql', variables('nameModifier')))]",
+      "properties": {
+        "privateEndpoint": {
+          "id": "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-pe', variables('nameModifier')))]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/privateEndpoints', format('{0}-pe', variables('nameModifier')))]",
+        "[resourceId('Microsoft.Sql/servers', format('{0}-sql', variables('nameModifier')))]"
+      ]
+    }
+  ],
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.1.62928",
+      "templateHash": "6467067091354204230"
+    }
+  }
+}
