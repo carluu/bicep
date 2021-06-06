@@ -1,11 +1,53 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.63.48766",
+      "templateHash": "17464041741993169031"
+    }
+  },
   "functions": [],
   "resources": [
     {
+      "type": "Microsoft.Cache/redisEnterprise/databases",
+      "apiVersion": "2021-02-01-preview",
+      "name": "[format('{0}/{1}', 'cuutestredis', 'redisdb')]",
+      "properties": {
+        "clientProtocol": "Encrypted",
+        "clusteringPolicy": "EnterpriseCluster",
+        "evictionPolicy": "NoEviction",
+        "modules": [
+          {
+            "name": "RedisBloom",
+            "args": "ERROR_RATE 0.00"
+          }
+        ],
+        "persistence": {
+          "aofEnabled": true,
+          "aofFrequency": "1s",
+          "rdbEnabled": false,
+          "rdbFrequency": "1h"
+        },
+        "port": 6379,
+        "geoReplication": {
+          "groupNickname": "redisgeorepgroup",
+          "linkedDatabases": [
+            {
+              "id": "[resourceId('Microsoft.Cache/redisEnterprise/databases', 'cuutestredis', 'redisdb')]"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Cache/redisEnterprise', 'cuutestredis')]"
+      ]
+    },
+    {
       "type": "Microsoft.Cache/redisEnterprise",
       "apiVersion": "2021-03-01",
+      "name": "cuutestredis",
       "properties": {
         "minimumTlsVersion": "1.2"
       },
@@ -13,15 +55,10 @@
         "capacity": 2,
         "name": "Enterprise_E10"
       },
-      "name": "cuutestredis",
+      "zones": [
+        "3"
+      ],
       "location": "centralus"
     }
-  ],
-  "metadata": {
-    "_generator": {
-      "name": "bicep",
-      "version": "0.3.1.62928",
-      "templateHash": "7025216116693733349"
-    }
-  }
+  ]
 }
