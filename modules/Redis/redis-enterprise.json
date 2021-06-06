@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.63.48766",
-      "templateHash": "17464041741993169031"
+      "templateHash": "11954057413720049112"
     }
   },
   "functions": [],
@@ -13,7 +13,7 @@
     {
       "type": "Microsoft.Cache/redisEnterprise/databases",
       "apiVersion": "2021-02-01-preview",
-      "name": "[format('{0}/{1}', 'cuutestredis', 'redisdb')]",
+      "name": "[format('{0}/{1}', 'cuutestredis', 'default')]",
       "properties": {
         "clientProtocol": "Encrypted",
         "clusteringPolicy": "EnterpriseCluster",
@@ -35,7 +35,7 @@
           "groupNickname": "redisgeorepgroup",
           "linkedDatabases": [
             {
-              "id": "[resourceId('Microsoft.Cache/redisEnterprise/databases', 'cuutestredis', 'redisdb')]"
+              "id": "[resourceId('Microsoft.Cache/redisEnterprise/databases', 'cuutestredis', 'default')]"
             }
           ]
         }

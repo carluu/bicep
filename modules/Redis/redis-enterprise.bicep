@@ -12,7 +12,7 @@ minimumTlsVersion: '1.2'
   name: 'cuutestredis'
   location: 'centralus'
   resource redisdb 'databases@2021-02-01-preview' = {
-    name: 'redisdb'
+    name: 'default'
     properties: {
       clientProtocol: 'Encrypted' // SSL required
       clusteringPolicy: 'EnterpriseCluster' // Whether to use the Redis or OSS API
@@ -34,7 +34,7 @@ minimumTlsVersion: '1.2'
         groupNickname: 'redisgeorepgroup'
         linkedDatabases: [
           {
-            id: resourceId('Microsoft.Cache/redisEnterprise/databases','cuutestredis','redisdb')
+            id: resourceId('Microsoft.Cache/redisEnterprise/databases','cuutestredis','default')
           }
         ]
       }
