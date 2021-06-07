@@ -17,7 +17,7 @@ minimumTlsVersion: '1.2'
       clientProtocol: 'Encrypted' // SSL required
       clusteringPolicy: 'EnterpriseCluster' // Whether to use the Redis or OSS API
       evictionPolicy: 'NoEviction' //https://redis.io/topics/lru-cache
-      modules: [
+      modules: [ // Can't be used in combination with geo-replication
         {
           name: 'RedisBloom' //Examples: RedisBloom, RediSearch, RedisTimeSeries
           args: 'ERROR_RATE 0.00'
