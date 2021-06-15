@@ -1,5 +1,5 @@
 param nameModifier string = 'cuubc'
-param subnetId string = 'nullid'
+param subnetId string = ''
 
 resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(subnetId == ''){
   name: '${nameModifier}-vnet'
@@ -20,24 +20,24 @@ resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(
   }
 }
 
-resource testAse 'Microsoft.Web/hostingEnvironments@2020-10-01' = {
+resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
   name: '${nameModifier}ase'
   location: resourceGroup().location
   kind: 'ASEV2'
   properties: {
-    name: '${nameModifier}ase'
     internalLoadBalancingMode:'None'
-    location: resourceGroup().location
     virtualNetwork: {
       id: '${subnetId == '' ? testSubnet.id : subnetId}'
     }
-    workerPools: [
+    multiSize: 'Small' // Front ennd VM size
+    frontEndScaleFactor: 15 // How many app service instances per front end
+    clusterSettings: [ // see: https://docs.microsoft.com/en-us/azure/app-service/environment/app-service-app-service-environment-custom-settings
       {
-        workerSizeId: 0
-        workerCount: 2
-        workerSize: 'Small'
+        name: 'DisableTls1.0'
+        value: '1'
       }
     ]
+    
   }
 }
 
@@ -59,6 +59,4 @@ resource testAsp 'Microsoft.Web/serverfarms@2020-10-01' = {
     reserved: false
   }
 }
-
-output asefqdn string = testAse.properties.dnsSuffix
 

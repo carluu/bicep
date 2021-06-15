@@ -1,6 +1,5 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
-param asefqdn string
 
 resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(subnetId == ''){
   name: '${nameModifier}-vnet'
@@ -15,7 +14,7 @@ resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(subnetId =
 }
 
 resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(subnetId == ''){
-  name: '${testVnet.name}/${nameModifier}asesubnet'
+  name: '${testVnet.name}/${nameModifier}appgwsubnet'
   properties: {
     addressPrefix: '10.0.0.0/24'
   }
@@ -76,7 +75,7 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
         properties: {
           backendAddresses: [
             {
-              fqdn: asefqdn
+              fqdn: 'test'
             }
           ]
         }

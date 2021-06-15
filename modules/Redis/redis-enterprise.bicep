@@ -34,7 +34,7 @@ minimumTlsVersion: '1.2'
         groupNickname: 'redisgeorepgroup'
         linkedDatabases: [
           {
-            id: resourceId('Microsoft.Cache/redisEnterprise/databases','cuutestredis','default')
+            //id: resourceId('Microsoft.Cache/redisEnterprise/databases','cuutestredis','default')
           }
         ]
       }

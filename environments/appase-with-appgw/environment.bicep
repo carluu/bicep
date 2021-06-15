@@ -39,6 +39,5 @@ module appgw '../../modules/AppGateway/appgateway.bicep' = {
   params: {
     nameModifier: nameModifier
     subnetId: appgwsubnet.id
-    asefqdn: ase.outputs.asefqdn
   }
 }
