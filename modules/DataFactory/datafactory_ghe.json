@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.63.48766",
+      "templateHash": "7785118300057737309"
+    }
+  },
+  "parameters": {
+    "nameModifier": {
+      "type": "string",
+      "defaultValue": "cuubc"
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.DataFactory/factories",
+      "apiVersion": "2018-06-01",
+      "name": "[format('{0}-adf', parameters('nameModifier'))]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "repoConfiguration": {
+          "type": "FactoryGitHubConfiguration",
+          "accountName": "carluu",
+          "collaborationBranch": "master",
+          "hostName": "10.10.10.10",
+          "repositoryName": "test",
+          "rootFolder": "test"
+        }
+      }
+    }
+  ]
+}

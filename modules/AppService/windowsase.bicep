@@ -1,22 +1,10 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
 
-resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(subnetId == ''){
-  name: '${nameModifier}-vnet'
-  location: resourceGroup().location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/8'
-      ]
-    }
-  }
-}
-
-resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(subnetId == ''){
-  name: '${testVnet.name}/${nameModifier}asesubnet'
-  properties: {
-    addressPrefix: '10.0.0.0/24'
+module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
+  name: 'testvnet'
+  params: {
+    nameModifier: nameModifier
   }
 }
 
@@ -27,7 +15,7 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
   properties: {
     internalLoadBalancingMode:'None'
     virtualNetwork: {
-      id: '${subnetId == '' ? testSubnet.id : subnetId}'
+      id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
     }
     multiSize: 'Small' // Front ennd VM size
     frontEndScaleFactor: 15 // How many app service instances per front end

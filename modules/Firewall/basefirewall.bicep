@@ -1,3 +1,5 @@
+//TODO: Add Log Analytics
+
 param nameModifier string = 'cuubc'
 param subnetId string = ''
 

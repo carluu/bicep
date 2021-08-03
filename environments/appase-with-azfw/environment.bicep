@@ -91,17 +91,6 @@ resource fwsubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
   name: '${vnet.name}/AzureFirewallSubnet'
   properties: {
     addressPrefix: '10.0.0.0/24'
-    serviceEndpoints: [
-      {
-        service: 'Microsoft.Storage'
-      }
-      {
-        service: 'Microsoft.Sql'
-      }
-      {
-        service: 'Microsoft.EventHub'
-      }
-    ]
   }
 }
 
@@ -138,14 +127,26 @@ resource defaultroute 'Microsoft.Network/routeTables/routes@2021-02-01' = {
 }
 
 resource asesubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
-  name: '${vnet.name}/${nameModifier}asesubnet'
+  name: '${vnet.name}/asesubnet'
   properties: {
     addressPrefix: '10.0.1.0/24'
     routeTable: {
       id: aseroutetable.id
     }
+    serviceEndpoints: [
+      {
+        service: 'Microsoft.Storage'
+      }
+      {
+        service: 'Microsoft.Sql'
+      }
+      {
+        service: 'Microsoft.EventHub'
+      }
+    ]    
   }
 }
+
 
 module ase '../../modules/AppService/windowsase.bicep' = {
   name: 'windowsase'
@@ -153,5 +154,8 @@ module ase '../../modules/AppService/windowsase.bicep' = {
     nameModifier: nameModifier
     subnetId: asesubnet.id
   }
-  dependsOn: aseroutes
+  dependsOn: [
+    aseroutes
+    asesubnet
+  ]
 }
