@@ -40,3 +40,6 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
 //     reserved: false
 //   }
 // }
+
+output aseId string = testAse.id
+//output aspId string = testAsp.id

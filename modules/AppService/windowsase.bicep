@@ -48,3 +48,7 @@ resource testAsp 'Microsoft.Web/serverfarms@2020-10-01' = {
   }
 }
 
+output aseProfile object = {
+  id : testAse.id
+}
+output aspId string = testAsp.id

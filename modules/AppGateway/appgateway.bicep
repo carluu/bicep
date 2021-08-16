@@ -1,22 +1,10 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
 
-resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(subnetId == ''){
-  name: '${nameModifier}-vnet'
-  location: resourceGroup().location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/8'
-      ]
-    }
-  }
-}
-
-resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(subnetId == ''){
-  name: '${testVnet.name}/${nameModifier}appgwsubnet'
-  properties: {
-    addressPrefix: '10.0.0.0/24'
+module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
+  name: 'testvnet'
+  params: {
+    nameModifier: nameModifier
   }
 }
 
@@ -46,7 +34,7 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: '${subnetId == '' ? testSubnet.id : subnetId }'
+            id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId }'
           }
         }
       }

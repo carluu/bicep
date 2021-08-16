@@ -2,22 +2,32 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
 
-resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01' = if(subnetId == ''){
-  name: '${nameModifier}-vnet'
-  location: resourceGroup().location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        '10.0.0.0/8'
-      ]
-    }
-  }
-}
+@allowed([
+  'Standard_Large'
+  'Standard_Medium'
+  'Standard_Small'
+  'Standard_v2'
+  'WAF_Large'
+  'WAF_Medium'
+  'WAF_v2'
+])
+param size string
 
-resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = if(subnetId == ''){
-  name: '${testVnet.name}/${nameModifier}appgwsubnet'
-  properties: {
-    addressPrefix: '10.0.0.0/24'
+@allowed([
+  'Standard'
+  'Standard_v2'
+  'WAF'
+  'WAF_v2'
+])
+param tier string
+
+param port int
+param backendFqdn string
+
+module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
+  name: 'testvnet'
+  params: {
+    nameModifier: nameModifier
   }
 }
 
@@ -39,15 +49,15 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
   properties: {
     sku: {
       capacity: 1
-      name: 'Standard_Small'
-      tier: 'Standard'
+      name: size
+      tier: tier
     }
     gatewayIPConfigurations:[
       {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: '${subnetId == '' ? testSubnet.id : subnetId }'
+            id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId }'
           }
         }
       }
@@ -66,7 +76,7 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
       {
         name: 'feport1'
         properties: {
-          port: 80
+          port: port
         }
       }
     ]
@@ -76,7 +86,7 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
         properties: {
           backendAddresses: [
             {
-              fqdn: 'test'
+              fqdn: backendFqdn
             }
           ]
         }
@@ -86,8 +96,8 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
       {
         name: 'behttpsettings1'
         properties: {
-          port: 80
-          protocol: 'Http'
+          port: port
+          protocol: port == 80 ? 'Http' : 'Https'
         }
       }
     ]
@@ -101,7 +111,7 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
           frontendPort: {
             id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', '${nameModifier}appgw','feport1')
           }
-          protocol: 'Http'
+          protocol: port == 80 ? 'Http' : 'Https'
         }
       }
     ]
