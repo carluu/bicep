@@ -1,6 +1,4 @@
 var nameModifier = 'cuubc'
-var webappOS = 'Windows'
-var stack = 'java'
 var phpVersion = 'OFF'
 var javaVersion = '11'
 var javaContainer = 'TOMCAT'

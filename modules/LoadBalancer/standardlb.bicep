@@ -4,7 +4,7 @@ param subnetId string = ''
 module basevnet '../../modules/Utility/basicvnet.bicep' = if(subnetId == '') {
   name: 'basevnet'
   params: {
-    nameModifier: nameModifier
+    nameModifier: '${nameModifier}ilb'
   }
 }
 

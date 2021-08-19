@@ -4,7 +4,7 @@ param subnetId string = ''
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
   params: {
-    nameModifier: nameModifier
+    nameModifier: '${nameModifier}appgw'
   }
 }
 

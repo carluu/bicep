@@ -1,4 +1,5 @@
 param nameModifier string = 'cuubc'
+param pePolicies string = 'Enabled'
 
 resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01'= {
   name: '${nameModifier}-vnet'
@@ -27,6 +28,7 @@ resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
         service: 'Microsoft.EventHub'
       }
     ]
+    privateEndpointNetworkPolicies: pePolicies
   }
 }
 

@@ -6,7 +6,7 @@ param lbport int = 1433
 module basevnet '../../modules/Utility/basicvnet.bicep' = if(subnetId == '') {
   name: 'basevnet'
   params: {
-    nameModifier: nameModifier
+    nameModifier: '${nameModifier}plfwd'
   }
 }
 
