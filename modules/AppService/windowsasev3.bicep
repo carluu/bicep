@@ -13,8 +13,8 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
   location: resourceGroup().location
   kind: 'ASEv3'
   properties: {
-    dedicatedHostCount: 0
-    zoneRedundant: false
+    //dedicatedHostCount: 0
+    //zoneRedundant: false
     internalLoadBalancingMode: 'Web, Publishing'
     virtualNetwork: {
       id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'

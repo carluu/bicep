@@ -6,7 +6,7 @@ param scriptdestport int = 1433
 param scriptip string = '10.10.10.10'
 param pubip bool = true
 
-var scripturl = 'https://raw.githubusercontent.com/carluu/bicep/main/modules/VM/privatelink_fwder_vm_script.sh'
+var scripturl = 'https://raw.githubusercontent.com/carluu/bicep/main/modules/PrivateLinkForwarder/privatelink_fwder_vm_script.sh'
 
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){

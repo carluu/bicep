@@ -10,7 +10,7 @@ module basevnet '../../modules/Utility/basicvnet.bicep' = if(subnetId == '') {
   }
 }
 
-module fwdervm1 '../../modules/VM/privatelink_fwder_vm.bicep' = {
+module fwdervm1 'privatelink_fwder_vm.bicep' = {
   name: 'fwdervm1'
   params: {
     nameModifier: '${nameModifier}1'
@@ -23,7 +23,7 @@ module fwdervm1 '../../modules/VM/privatelink_fwder_vm.bicep' = {
   }
 }
 
-module fwdervm2 '../../modules/VM/privatelink_fwder_vm.bicep' = {
+module fwdervm2 'privatelink_fwder_vm.bicep' = {
   name: 'fwdervm2'
   params: {
     nameModifier: '${nameModifier}2'
