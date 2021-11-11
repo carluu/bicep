@@ -16,6 +16,10 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-08-01' = {
   }
 }
 
+// resource vnet 'Microsoft.Network/virtualNetworks@2020-08-01' existing =  {
+//   name: '${nameModifier}-vnet'
+// }
+
 resource asesubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
   name: '${vnet.name}/${nameModifier}asesubnet'
   properties: {
@@ -64,8 +68,8 @@ module appgw '../../modules/AppGateway/appgateway-params.bicep' = {
     nameModifier: nameModifier
     subnetId: appgwsubnet.id
     port: 80
-    size: 'Standard_Small'
-    tier: 'Standard'
+    size: 'Standard_v2'
+    tier: 'Standard_v2'
     backendFqdn: webapp.properties.defaultHostName
   }
 }

@@ -57,7 +57,7 @@ resource fwderSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
 }
 
 resource fwderPeSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
-  name: '${fwderVnet.name}/fwderPe'
+  name: '${fwderVnet.name}/fwderPl'
   properties: {
     addressPrefix: '10.1.1.0/24'
   }
@@ -110,6 +110,17 @@ module fwder '../../modules/PrivateLinkForwarder/privatelink-fwder-full.bicep' =
     vmpass: vmpass
     subnetId: fwderSubnet.id
   }
-
 }
+
+// Set up private link/endpoint
+// resource privatelink 'Microsoft.Network/privateLinkServices@2021-02-01' = {
+//   dependsOn: [
+//     fwder
+//   ]
+//   name: '${nameModifier}privatelink'
+//   location: resourceGroup().location
+//   properties: {
+
+//   }
+// }
 

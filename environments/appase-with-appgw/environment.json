@@ -1,0 +1,519 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.63.48766",
+      "templateHash": "16228296021377697289"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "nameModifier": "cuubc",
+    "phpVersion": "OFF",
+    "javaVersion": "11",
+    "javaContainer": "TOMCAT",
+    "javaContainerVersion": "9.0"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2020-08-01",
+      "name": "[format('{0}-vnet', variables('nameModifier'))]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/8"
+          ]
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2020-08-01",
+      "name": "[format('{0}/{1}asesubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier'))]",
+      "properties": {
+        "addressPrefix": "10.0.0.0/24"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', variables('nameModifier')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2020-08-01",
+      "name": "[format('{0}/{1}appgwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier'))]",
+      "properties": {
+        "addressPrefix": "10.0.1.0/24"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}asesubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[0], split(format('{0}/{1}asesubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[1])]",
+        "[resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', variables('nameModifier')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2021-01-15",
+      "name": "[format('{0}-webapp', variables('nameModifier'))]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "serverFarmId": "[reference(resourceId('Microsoft.Resources/deployments', 'windowsase'), '2019-10-01').outputs.aspId.value]",
+        "siteConfig": {
+          "alwaysOn": true,
+          "phpVersion": "[variables('phpVersion')]",
+          "javaVersion": "[variables('javaVersion')]",
+          "javaContainer": "[variables('javaContainer')]",
+          "javaContainerVersion": "[variables('javaContainerVersion')]"
+        },
+        "clientAffinityEnabled": true,
+        "hostingEnvironmentProfile": "[reference(resourceId('Microsoft.Resources/deployments', 'windowsase'), '2019-10-01').outputs.aseProfile.value]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/deployments', 'windowsase')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "windowsase",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "nameModifier": {
+            "value": "[variables('nameModifier')]"
+          },
+          "subnetId": {
+            "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}asesubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[0], split(format('{0}/{1}asesubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[1])]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "7788783387621680541"
+            }
+          },
+          "parameters": {
+            "nameModifier": {
+              "type": "string",
+              "defaultValue": "cuubc"
+            },
+            "subnetId": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Web/hostingEnvironments",
+              "apiVersion": "2021-01-01",
+              "name": "[format('{0}ase', parameters('nameModifier'))]",
+              "location": "[resourceGroup().location]",
+              "kind": "ASEV2",
+              "properties": {
+                "internalLoadBalancingMode": "None",
+                "virtualNetwork": {
+                  "id": "[if(equals(parameters('subnetId'), ''), reference(resourceId('Microsoft.Resources/deployments', 'testvnet'), '2019-10-01').outputs.subnetId.value, parameters('subnetId'))]"
+                },
+                "multiSize": "Small",
+                "frontEndScaleFactor": 15,
+                "clusterSettings": [
+                  {
+                    "name": "DisableTls1.0",
+                    "value": "1"
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'testvnet')]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2020-10-01",
+              "name": "[format('{0}-asp', parameters('nameModifier'))]",
+              "location": "[resourceGroup().location]",
+              "kind": "",
+              "sku": {
+                "tier": "Isolated",
+                "name": "I1"
+              },
+              "properties": {
+                "hostingEnvironmentProfile": {
+                  "id": "[resourceId('Microsoft.Web/hostingEnvironments', format('{0}ase', parameters('nameModifier')))]"
+                },
+                "isSpot": false,
+                "isXenon": false,
+                "hyperV": false,
+                "reserved": false
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/hostingEnvironments', format('{0}ase', parameters('nameModifier')))]"
+              ]
+            },
+            {
+              "condition": "[equals(parameters('subnetId'), '')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2019-10-01",
+              "name": "testvnet",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "nameModifier": {
+                    "value": "[format('{0}ase', parameters('nameModifier'))]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.4.63.48766",
+                      "templateHash": "4867642784437792733"
+                    }
+                  },
+                  "parameters": {
+                    "nameModifier": {
+                      "type": "string",
+                      "defaultValue": "cuuvnet"
+                    },
+                    "pePolicies": {
+                      "type": "string",
+                      "defaultValue": "Enabled"
+                    }
+                  },
+                  "functions": [],
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/virtualNetworks",
+                      "apiVersion": "2020-08-01",
+                      "name": "[format('{0}-vnet', parameters('nameModifier'))]",
+                      "location": "[resourceGroup().location]",
+                      "properties": {
+                        "addressSpace": {
+                          "addressPrefixes": [
+                            "10.0.0.0/8"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks/subnets",
+                      "apiVersion": "2020-08-01",
+                      "name": "[format('{0}/default', format('{0}-vnet', parameters('nameModifier')))]",
+                      "properties": {
+                        "addressPrefix": "10.0.0.0/24",
+                        "privateEndpointNetworkPolicies": "[parameters('pePolicies')]"
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', parameters('nameModifier')))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "subnetId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/default', format('{0}-vnet', parameters('nameModifier'))), '/')[0], split(format('{0}/default', format('{0}-vnet', parameters('nameModifier'))), '/')[1])]"
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "outputs": {
+            "aseProfile": {
+              "type": "object",
+              "value": {
+                "id": "[resourceId('Microsoft.Web/hostingEnvironments', format('{0}ase', parameters('nameModifier')))]"
+              }
+            },
+            "aspId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Web/serverfarms', format('{0}-asp', parameters('nameModifier')))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}asesubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[0], split(format('{0}/{1}asesubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[1])]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "appgw",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "nameModifier": {
+            "value": "[variables('nameModifier')]"
+          },
+          "subnetId": {
+            "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}appgwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[0], split(format('{0}/{1}appgwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[1])]"
+          },
+          "port": {
+            "value": 80
+          },
+          "size": {
+            "value": "Standard_v2"
+          },
+          "tier": {
+            "value": "Standard_v2"
+          },
+          "backendFqdn": {
+            "value": "[reference(resourceId('Microsoft.Web/sites', format('{0}-webapp', variables('nameModifier')))).defaultHostName]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "1350034299070466148"
+            }
+          },
+          "parameters": {
+            "nameModifier": {
+              "type": "string",
+              "defaultValue": "cuubc"
+            },
+            "subnetId": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "size": {
+              "type": "string",
+              "allowedValues": [
+                "Standard_Large",
+                "Standard_Medium",
+                "Standard_Small",
+                "Standard_v2",
+                "WAF_Large",
+                "WAF_Medium",
+                "WAF_v2"
+              ]
+            },
+            "tier": {
+              "type": "string",
+              "allowedValues": [
+                "Standard",
+                "Standard_v2",
+                "WAF",
+                "WAF_v2"
+              ]
+            },
+            "port": {
+              "type": "int"
+            },
+            "backendFqdn": {
+              "type": "string"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2020-11-01",
+              "name": "[format('{0}-pubip', parameters('nameModifier'))]",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "publicIPAddressVersion": "IPv4"
+              }
+            },
+            {
+              "type": "Microsoft.Network/applicationGateways",
+              "apiVersion": "2020-11-01",
+              "name": "[format('{0}appgw', parameters('nameModifier'))]",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "sku": {
+                  "capacity": 1,
+                  "name": "[parameters('size')]",
+                  "tier": "[parameters('tier')]"
+                },
+                "gatewayIPConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[if(equals(parameters('subnetId'), ''), reference(resourceId('Microsoft.Resources/deployments', 'testvnet'), '2019-10-01').outputs.subnetId.value, parameters('subnetId'))]"
+                      }
+                    }
+                  }
+                ],
+                "frontendIPConfigurations": [
+                  {
+                    "name": "feconfig1",
+                    "properties": {
+                      "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pubip', parameters('nameModifier')))]"
+                      }
+                    }
+                  }
+                ],
+                "frontendPorts": [
+                  {
+                    "name": "feport1",
+                    "properties": {
+                      "port": "[parameters('port')]"
+                    }
+                  }
+                ],
+                "backendAddressPools": [
+                  {
+                    "name": "bepool1",
+                    "properties": {
+                      "backendAddresses": [
+                        {
+                          "fqdn": "[parameters('backendFqdn')]"
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "backendHttpSettingsCollection": [
+                  {
+                    "name": "behttpsettings1",
+                    "properties": {
+                      "port": "[parameters('port')]",
+                      "protocol": "[if(equals(parameters('port'), 80), 'Http', 'Https')]"
+                    }
+                  }
+                ],
+                "httpListeners": [
+                  {
+                    "name": "httplistener1",
+                    "properties": {
+                      "frontendIPConfiguration": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', format('{0}appgw', parameters('nameModifier')), 'feconfig1')]"
+                      },
+                      "frontendPort": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/frontendPorts', format('{0}appgw', parameters('nameModifier')), 'feport1')]"
+                      },
+                      "protocol": "[if(equals(parameters('port'), 80), 'Http', 'Https')]"
+                    }
+                  }
+                ],
+                "requestRoutingRules": [
+                  {
+                    "name": "routingrule1",
+                    "properties": {
+                      "httpListener": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/httpListeners', format('{0}appgw', parameters('nameModifier')), 'httplistener1')]"
+                      },
+                      "backendAddressPool": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendAddressPools', format('{0}appgw', parameters('nameModifier')), 'bepool1')]"
+                      },
+                      "backendHttpSettings": {
+                        "id": "[resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', format('{0}appgw', parameters('nameModifier')), 'behttpsettings1')]"
+                      }
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', format('{0}-pubip', parameters('nameModifier')))]",
+                "[resourceId('Microsoft.Resources/deployments', 'testvnet')]"
+              ]
+            },
+            {
+              "condition": "[equals(parameters('subnetId'), '')]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2019-10-01",
+              "name": "testvnet",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "nameModifier": {
+                    "value": "[format('{0}appgw', parameters('nameModifier'))]"
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.4.63.48766",
+                      "templateHash": "4867642784437792733"
+                    }
+                  },
+                  "parameters": {
+                    "nameModifier": {
+                      "type": "string",
+                      "defaultValue": "cuuvnet"
+                    },
+                    "pePolicies": {
+                      "type": "string",
+                      "defaultValue": "Enabled"
+                    }
+                  },
+                  "functions": [],
+                  "resources": [
+                    {
+                      "type": "Microsoft.Network/virtualNetworks",
+                      "apiVersion": "2020-08-01",
+                      "name": "[format('{0}-vnet', parameters('nameModifier'))]",
+                      "location": "[resourceGroup().location]",
+                      "properties": {
+                        "addressSpace": {
+                          "addressPrefixes": [
+                            "10.0.0.0/8"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "Microsoft.Network/virtualNetworks/subnets",
+                      "apiVersion": "2020-08-01",
+                      "name": "[format('{0}/default', format('{0}-vnet', parameters('nameModifier')))]",
+                      "properties": {
+                        "addressPrefix": "10.0.0.0/24",
+                        "privateEndpointNetworkPolicies": "[parameters('pePolicies')]"
+                      },
+                      "dependsOn": [
+                        "[resourceId('Microsoft.Network/virtualNetworks', format('{0}-vnet', parameters('nameModifier')))]"
+                      ]
+                    }
+                  ],
+                  "outputs": {
+                    "subnetId": {
+                      "type": "string",
+                      "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/default', format('{0}-vnet', parameters('nameModifier'))), '/')[0], split(format('{0}/default', format('{0}-vnet', parameters('nameModifier'))), '/')[1])]"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', split(format('{0}/{1}appgwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[0], split(format('{0}/{1}appgwsubnet', format('{0}-vnet', variables('nameModifier')), variables('nameModifier')), '/')[1])]",
+        "[resourceId('Microsoft.Web/sites', format('{0}-webapp', variables('nameModifier')))]"
+      ]
+    }
+  ]
+}

@@ -34,8 +34,12 @@ module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
 resource pubIp 'Microsoft.Network/publicIPAddresses@2020-11-01' = {
   name: '${nameModifier}-pubip'
   location: resourceGroup().location
+  sku: {
+    name: 'Standard'
+    tier: 'Regional'
+  }
   properties: {
-    publicIPAllocationMethod:'Dynamic'
+    publicIPAllocationMethod:'Static'
     publicIPAddressVersion: 'IPv4'
   }
 }
