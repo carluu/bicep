@@ -1,4 +1,8 @@
 param nameModifier string = 'cuuvnet'
+@allowed([
+  'Enabled'
+  'Disabled'
+])
 param pePolicies string = 'Enabled'
 
 resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01'= {
@@ -21,4 +25,6 @@ resource testSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = {
   }
 }
 
+output vnetId string = testVnet.id
+output vnetName string = testVnet.name
 output subnetId string = testSubnet.id

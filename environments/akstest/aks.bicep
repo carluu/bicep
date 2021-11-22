@@ -1,5 +1,3 @@
-//param aksSpClientId string 
-//param aksSpClientSecret string 
 var aksName = 'testaks'
 var aksLocation = 'eastus2'
 var aksDnsPrefix = 'carluutestaks'
