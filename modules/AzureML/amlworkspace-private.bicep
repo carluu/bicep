@@ -1,4 +1,4 @@
-param nameModifier string = 'cuuaml'
+param nameModifier string = 'cuuaml6'
 param vnetId string = ''
 param subnetId string = ''
 param storageId string = ''
@@ -76,7 +76,7 @@ resource amlWorkspace 'Microsoft.MachineLearningServices/workspaces@2021-07-01' 
     friendlyName: '${nameModifier}amlworkspace'
     storageAccount: storageId == '' ? amlStorage.id : storageId
     keyVault: akvId == '' ? amlAkv.id : akvId
-    applicationInsights: insightsId == '' ? amlAppInsights.id : insightsId
+    applicationInsights: '/subscriptions/7929c68b-f2f7-483c-a1c4-196873a31c6c/resourceGroups/testaml3/providers/microsoft.insights/components/cuufakeappinsights'//insightsId == '' ? amlAppInsights.id : insightsId
     containerRegistry: acrId == '' ? amlAcr.id : acrId
     hbiWorkspace: true
     allowPublicAccessWhenBehindVnet: false

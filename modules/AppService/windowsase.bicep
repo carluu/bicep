@@ -17,7 +17,7 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
     virtualNetwork: {
       id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
     }
-    multiSize: 'Small' // Front ennd VM size
+    multiSize: 'Small' // Front end VM size
     frontEndScaleFactor: 15 // How many app service instances per front end
     clusterSettings: [ // see: https://docs.microsoft.com/en-us/azure/app-service/environment/app-service-app-service-environment-custom-settings
       {

@@ -2,6 +2,15 @@
 
 param nameModifier string = 'cuubc'
 param subnetId string = ''
+param laworkspaceId string
+
+module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
+  name: 'testvnet'
+  params: {
+    nameModifier: nameModifier
+    isFirewall: true
+  }
+}
 
 resource fwpubip 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   name: '${nameModifier}-fwpubip'
@@ -28,7 +37,7 @@ resource firewall 'Microsoft.Network/azureFirewalls@2021-02-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: subnetId
+            id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
           }
           publicIPAddress: {
             id: fwpubip.id
@@ -96,6 +105,28 @@ resource firewall 'Microsoft.Network/azureFirewalls@2021-02-01' = {
         }
       }
     ]    
+  }
+}
+
+resource fwdiag 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'fwdiag'
+  scope: firewall
+  properties: {
+    workspaceId: laworkspaceId
+    logs: [
+      {
+        category: 'AzureFirewallApplicationRule'
+        enabled: true
+      }
+      {
+        category: 'AzureFirewallNetworkRule'
+        enabled: true
+      } 
+      {
+        category: 'AzureFirewallDnsProxy'
+        enabled: true
+      }       
+    ]
   }
 }
 

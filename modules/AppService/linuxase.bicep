@@ -33,7 +33,7 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
 resource testAsp 'Microsoft.Web/serverfarms@2020-10-01' = {
   name: '${nameModifier}-asp'
   location: resourceGroup().location
-  kind: ''
+  kind: 'linux'
   sku: {
     tier: 'Isolated'
     name: 'I1'
