@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "route_table_name": {
+            "type": "String",
+            "metadata": {
+                "desciption": "Provide name of the route table"
+            }
+        },
+        "route_entry_types": {
+            "defaultValue": [],
+            "type": "Array"
+        },
+        "route_entries": {
+            "defaultValue": [],
+            "type": "Array"
+        },
+        "disableBgpRoutePropagation": {
+            "defaultValue": false,
+            "type": "Bool"
+        },
+        "route_next_hop_type": {
+            "defaultValue": "Internet",
+            "type": "String"
+        },
+        "nextHopIpAddress": {
+            "defaultValue": "",
+            "type": "String"
+        },
+        "tagDefs": {
+            "type": "Object",
+            "metadata": {
+                "desciption": "Provide tags as an object"
+            }
+        }
+    },
+    "variables": {
+        "networkApiVersion": "2020-11-01"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "[variables('networkApiVersion')]",
+            "name": "[parameters('route_table_name')]",
+            "location": "[resourceGroup().location]",
+            "tags": "[parameters('tagDefs')]",
+            "properties": {
+                "disableBgpRoutePropagation": "[parameters('disableBgpRoutePropagation')]",
+                "copy": [
+                    {
+                        "name": "routes",
+                        "count": "[if(not(empty(parameters('route_entry_types'))), length(parameters('route_entry_types')), length(parameters('route_entries')))]",
+                        "input": {
+                            "name": "[concat('route_',copyIndex('routes'))]",
+                            "properties": {
+                                "addressPrefix": "[if(not(empty(parameters('route_entry_types'))), concat(parameters('route_entry_types')[copyIndex('routes')].route_entries), concat(parameters('route_entries')[copyIndex('routes')]))]",
+                                "nextHopType": "[if(not(empty(parameters('route_entry_types'))), concat(parameters('route_entry_types')[copyIndex('routes')].route_next_hop_type), parameters('route_next_hop_type'))]",
+                                "nextHopIpAddress": "[if(not(empty(parameters('route_entry_types'))), concat(parameters('route_entry_types')[copyIndex('routes')].nextHopIpAddress), parameters('nextHopIpAddress'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "condition": "[or( not(empty(parameters('route_entry_types'))), not(empty(parameters('route_entries'))) )]"
+        }
+    ]
+}

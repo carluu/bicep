@@ -12,11 +12,11 @@ resource pubIp 'Microsoft.Network/publicIPAddresses@2020-11-01' = {
   name: '${nameModifier}-pubip'
   location: resourceGroup().location
   sku: {
-    name: 'Standard'
+    name: 'Basic'
     tier: 'Regional'
   }
   properties: {
-    publicIPAllocationMethod:'Static'
+    publicIPAllocationMethod:'Dynamic'
     publicIPAddressVersion: 'IPv4'
   }
 }

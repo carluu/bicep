@@ -1,0 +1,54 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "route_table_name": {
+            "value": "e3001-centralus-routetable-aml-1"
+        },
+        "route_entry_types": {
+            "value": [
+                {
+                    "route_next_hop_type": "VirtualAppliance",
+                    "nextHopIpAddress": "10.196.137.164",
+                    "route_entries": "0.0.0.0/0"
+                },
+                {
+                    "route_next_hop_type": "Internet",
+                    "nextHopIpAddress": "",
+                    "route_entries": "BatchNodeManagement"
+                },
+                {
+                    "route_next_hop_type": "Internet",
+                    "nextHopIpAddress": "",
+                    "route_entries": "AzureMachineLearning"
+                }
+            ]
+        },
+        "route_entries": {
+            "value": []
+        },
+        "disableBgpRoutePropagation": {
+            "value": true
+        },
+        "route_next_hop_type": {
+            "value": "Internet"
+        },
+        "nextHopIpAddress": {
+            "value": ""
+        },
+        "tagDefs": {
+            "value": {
+                "lob": "its",
+                "malcode": "azcld",
+                "costcenter": "6285",
+                "env": "englab",
+                "creation_data": "20220201",
+                "git_commit": "6bbf54218e80dacb1f792c0eb61c174f140cdb43",
+                "networksubzone": "pci",
+                "drriskrating": "Extensive",
+                "availability": "Extensive",
+                "data_classification": "Restricted"
+            }
+        }
+    }
+}
