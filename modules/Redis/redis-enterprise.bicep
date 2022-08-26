@@ -1,6 +1,6 @@
 resource redis 'Microsoft.Cache/redisEnterprise@2021-03-01' = {
   properties: {
-minimumTlsVersion: '1.2'
+    minimumTlsVersion: '1.2'
   }
   sku: {
     capacity: 2 // 2,4,6,etc. for non-flash
@@ -12,7 +12,7 @@ minimumTlsVersion: '1.2'
   name: 'cuutestredis'
   location: 'centralus'
   resource redisdb 'databases@2021-02-01-preview' = {
-    name: 'default'
+    name: 'redisdb'
     properties: {
       clientProtocol: 'Encrypted' // SSL required
       clusteringPolicy: 'EnterpriseCluster' // Whether to use the Redis or OSS API
