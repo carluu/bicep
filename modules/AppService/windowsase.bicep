@@ -16,7 +16,7 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
   properties: {
     internalLoadBalancingMode:'None'
     virtualNetwork: {
-      id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+      id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
     }
     multiSize: 'Small' // Front end VM size
     frontEndScaleFactor: 15 // How many app service instances per front end

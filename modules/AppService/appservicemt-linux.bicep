@@ -1,16 +1,16 @@
 // Kind values for webapp: https://github.com/Azure/app-service-linux-docs/blob/master/Things_You_Should_Know/kind_property.md
-// App Service Plan doesn't respect kind. for ASP:  (if reserved = true, it’s a Linux ASP, otherwise it’s a Windows ASP).
+// App Service Plan doesn't respect kind. Instead for ASP:  (if reserved = true, it’s a Linux ASP, otherwise it’s a Windows ASP).
 
-param nameModifier string = 'cuuappserv'
-param ibSubnetId string = ''
-param obSubnetId string = ''
-param vnetInjected bool = true
-param vnetRouteAll bool = true
-param peEnabled bool = true
-param skuTier string = 'PremiumV2'
-param skuName string = 'P1v2'
-param zoneRedundant bool = false
-param linuxFxVersion string = 'TOMCAT|10.0-java17'
+param nameModifier string
+param ibSubnetId string
+param obSubnetId string
+param vnetInjected bool
+param vnetRouteAll bool
+param peEnabled bool
+param skuTier string
+param skuName string
+param zoneRedundant bool
+param linuxFxVersion string 
 param region string = resourceGroup().location
 
 

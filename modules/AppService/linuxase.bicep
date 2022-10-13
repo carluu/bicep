@@ -1,5 +1,6 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
+param region string = resourceGroup().location
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
@@ -10,13 +11,12 @@ module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
 
 resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
   name: '${nameModifier}ase'
-  location: resourceGroup().location
+  location: region
   kind: 'ASEV2'
   properties: {
     internalLoadBalancingMode:'None'
-    osPreference: 'linux'
     virtualNetwork: {
-      id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+      id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
     }
     multiSize: 'Small' // Front end VM size
     frontEndScaleFactor: 15 // How many app service instances per front end
@@ -32,7 +32,7 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
 
 resource testAsp 'Microsoft.Web/serverfarms@2020-10-01' = {
   name: '${nameModifier}-asp'
-  location: resourceGroup().location
+  location: region
   kind: 'linux'
   sku: {
     tier: 'Isolated'

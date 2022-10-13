@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "nameModifier": {
+        "value": "cuuappservtest2"
+      },
+      "ibSubnetId": {
+        "value": ""
+      },
+      "obSubnetId": {
+        "value": ""
+      },  
+      "vnetInjected": {
+        "value": false
+      },   
+      "vnetRouteAll": {
+        "value": false
+      }, 
+      "peEnabled": {
+        "value": false
+      },    
+      "skuTier": {
+        "value": "Basic"
+      },  
+      "skuName": {
+        "value": "B1 "
+      }, 
+      "zoneRedundant": {
+        "value": false
+      },         
+      "linuxFxVersion": {
+        "value": "PYTHON|3.10"
+      },
+      "repoUrl": {
+        "value": "https://github.com/carluu"
+      },
+      "repoBranch": {
+        "value": "main"
+      }
+    } 
+}  
