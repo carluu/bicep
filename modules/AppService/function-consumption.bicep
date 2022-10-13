@@ -53,7 +53,7 @@ resource app 'Microsoft.Web/sites@2022-03-01' = {
           value: 'DefaultEndpointsProtocol=https;AccountName=${functionstorage.name};AccountKey=${functionstorage.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
         }                      
       ]
-      //linuxFxVersion: 'Python|3.9'
+      linuxFxVersion: 'Python|3.9'
     }
     serverFarmId: asp.id
     httpsOnly: true
