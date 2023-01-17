@@ -5,6 +5,7 @@ param vmpass string
 param pubip bool = true
 param vmsize string = 'Standard_B2ms'
 param accelNet bool = false
+param region string = resourceGroup().location
 
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
@@ -16,7 +17,7 @@ module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
 
 resource publicip 'Microsoft.Network/publicIPAddresses@2021-02-01' = if(pubip) {
   name: '${nameModifier}ubupubip'
-  location: resourceGroup().location
+  location: region
   sku: {
     name: 'Basic'
     tier: 'Regional'
@@ -29,7 +30,7 @@ resource publicip 'Microsoft.Network/publicIPAddresses@2021-02-01' = if(pubip) {
 
 resource fwdernic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
   name: '${nameModifier}ubunic'
-  location: resourceGroup().location
+  location: region
   properties: {
     enableAcceleratedNetworking: accelNet
     ipConfigurations: [
@@ -56,7 +57,7 @@ resource fwdernic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
 
 resource fwdervm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
   name: '${nameModifier}ubuvm'
-  location: resourceGroup().location
+  location: region
   properties: {
     hardwareProfile: {
       vmSize: vmsize

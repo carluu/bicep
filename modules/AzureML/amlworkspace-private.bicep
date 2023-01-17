@@ -5,21 +5,22 @@ param storageId string = ''
 param akvId string = ''
 param insightsId string = ''
 param acrId string = ''
+param region string = resourceGroup().location
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: '${nameModifier}-vnet'
   params: {
     nameModifier: nameModifier
     pePolicies: 'Disabled'
+    region: region
   }
 }
-
 
 // Required resources
 resource amlStorage 'Microsoft.Storage/storageAccounts@2021-06-01' = if(storageId == ''){
   name: '${nameModifier}stg'
   kind: 'StorageV2'
-  location: resourceGroup().location
+  location: region
   sku: {
     name: 'Standard_LRS'
   }
@@ -30,7 +31,7 @@ resource amlStorage 'Microsoft.Storage/storageAccounts@2021-06-01' = if(storageI
 
 resource amlAkv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = if(akvId == '') {
   name: '${nameModifier}akv'
-  location: resourceGroup().location
+  location: region
   properties: {
     sku: {
       name: 'standard'
@@ -45,7 +46,7 @@ resource amlAkv 'Microsoft.KeyVault/vaults@2021-06-01-preview' = if(akvId == '')
 resource amlAppInsights 'Microsoft.Insights/components@2020-02-02' = if(insightsId == '') {
   name: '${nameModifier}insights'
   kind: 'web'
-  location: resourceGroup().location
+  location: region
   properties: {
     Application_Type: 'web'
   }
@@ -53,7 +54,7 @@ resource amlAppInsights 'Microsoft.Insights/components@2020-02-02' = if(insights
 
 resource amlAcr 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = if(acrId == '') {
   name: '${nameModifier}acr'
-  location: resourceGroup().location
+  location: region
   sku: {
     name: 'Standard'
   }
@@ -67,7 +68,7 @@ resource amlAcr 'Microsoft.ContainerRegistry/registries@2021-06-01-preview' = if
 // Workspace
 resource amlWorkspace 'Microsoft.MachineLearningServices/workspaces@2021-07-01' = {
   name: '${nameModifier}amlworkspace'
-  location: resourceGroup().location
+  location: region
   sku: {
     name: 'Basic'
     tier: 'Basic'
@@ -92,7 +93,7 @@ resource amlWorkspace 'Microsoft.MachineLearningServices/workspaces@2021-07-01' 
 // Private endpoint stuff
 resource workspacePe 'Microsoft.Network/privateEndpoints@2021-03-01' = {
   name: '${nameModifier}workspacepe'
-  location: resourceGroup().location
+  location: region
   properties: {
     privateLinkServiceConnections: [
       {

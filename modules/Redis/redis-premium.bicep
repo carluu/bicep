@@ -1,7 +1,8 @@
 param nameModifier string = 'cuubc'
+param region string = resourceGroup().location
 
 resource redis 'Microsoft.Cache/redis@2021-06-01' = {
-  location: resourceGroup().location
+  location: region
   name: '${nameModifier}-redis'
   properties: {
     sku: {

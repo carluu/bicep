@@ -1,16 +1,18 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
+param region string = resourceGroup().location
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
   params: {
     nameModifier: '${nameModifier}appgw'
+    region: region
   }
 }
 
 resource pubIp 'Microsoft.Network/publicIPAddresses@2020-11-01' = {
   name: '${nameModifier}-pubip'
-  location: resourceGroup().location
+  location:  region
   sku: {
     name: 'Basic'
     tier: 'Regional'
@@ -22,11 +24,9 @@ resource pubIp 'Microsoft.Network/publicIPAddresses@2020-11-01' = {
 }
 
 resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
-  dependsOn: [
-    pubIp
-  ]
+
   name: '${nameModifier}appgw'
-  location: resourceGroup().location
+  location: region
   properties: {
     sku: {
       capacity: 1

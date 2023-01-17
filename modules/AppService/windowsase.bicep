@@ -6,6 +6,7 @@ module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
   params: {
     nameModifier: '${nameModifier}ase'
+    region: region
   }
 }
 

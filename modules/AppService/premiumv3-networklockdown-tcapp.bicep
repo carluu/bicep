@@ -1,10 +1,11 @@
 param nameModifier string = 'astesting'
 param peSubnetId string = ''
 param egressSubnetId string = ''
+param region string = resourceGroup().location
 
 resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = if (peSubnetId == '' && egressSubnetId == '') {
   name: '${nameModifier}-vnet'
-  location: resourceGroup().location
+  location: region
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -39,7 +40,7 @@ resource egresssubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = i
 
 resource asp 'Microsoft.Web/serverfarms@2021-02-01' = {
   name: '${nameModifier}-asp'
-  location: resourceGroup().location
+  location: region
   kind: 'app'
   sku: {
     name: 'P1v3'
@@ -55,7 +56,7 @@ resource asp 'Microsoft.Web/serverfarms@2021-02-01' = {
 
 resource webapp 'Microsoft.Web/sites@2021-02-01' = {
   name: '${nameModifier}-webapp'
-  location: resourceGroup().location
+  location: region
   kind: 'app'
   properties: {
     serverFarmId: asp.id
@@ -73,7 +74,7 @@ resource webapp 'Microsoft.Web/sites@2021-02-01' = {
 
 resource webapppe 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   name: '${nameModifier}-webapppe'
-  location: resourceGroup().location
+  location: region
   properties: {
     subnet: {
        id: '${peSubnetId == '' ? pesubnet.id : peSubnetId}'

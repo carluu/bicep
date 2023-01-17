@@ -1,6 +1,7 @@
 var nameModifier = 'sqlwithpe'
 param subnetId string = ''
 param adminPassword string
+param region string = resourceGroup().location
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
@@ -12,7 +13,7 @@ module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
 
 resource testPeForSql 'Microsoft.Network/privateEndpoints@2020-11-01' = {
   name: '${nameModifier}-pe'
-  location: resourceGroup().location
+  location: region
   properties: {
     subnet: {
       id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
@@ -33,7 +34,7 @@ resource testPeForSql 'Microsoft.Network/privateEndpoints@2020-11-01' = {
 
 resource testSql 'Microsoft.Sql/servers@2020-11-01-preview' = {
   name: '${nameModifier}-sql'
-  location: resourceGroup().location
+  location: region
   properties: {
       administratorLogin: 'testpeadmin'
       administratorLoginPassword: adminPassword

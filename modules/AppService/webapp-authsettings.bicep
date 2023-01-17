@@ -1,9 +1,10 @@
 param nameModifier string = 'cuubcweb'
 param tenantId string
 param clientId string
+param region string = resourceGroup().location
 
 resource asp 'Microsoft.Web/serverfarms@2021-02-01' = {
-  location: resourceGroup().location
+  location: region
   name: '${nameModifier}-asp'
   kind: 'linux'
   sku: {
@@ -22,7 +23,7 @@ resource asp 'Microsoft.Web/serverfarms@2021-02-01' = {
 }
 
 resource app 'Microsoft.Web/sites@2021-02-01' = {
-  location: resourceGroup().location
+  location: region
   name: '${nameModifier}-app'
   kind: 'app,linux'
   properties: {

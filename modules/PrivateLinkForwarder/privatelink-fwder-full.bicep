@@ -2,11 +2,13 @@ param nameModifier string = 'cuubc'
 param subnetId string = ''
 param vmpass string
 param lbport int = 1433
+param region string = resourceGroup().location
 
 module basevnet '../../modules/Utility/basicvnet.bicep' = if(subnetId == '') {
   name: 'basevnet'
   params: {
     nameModifier: '${nameModifier}plfwd'
+    region: region
   }
 }
 
@@ -20,6 +22,7 @@ module fwdervm1 'privatelink_fwder_vm.bicep' = {
     scriptdestport: lbport
     scriptsrcport: lbport
     scriptip: '10.10.10.10'
+    region: region
   }
 }
 
@@ -33,6 +36,7 @@ module fwdervm2 'privatelink_fwder_vm.bicep' = {
     scriptdestport: lbport
     scriptsrcport: lbport
     scriptip: '10.10.10.10'
+    region: region
   }
 }
 
@@ -42,7 +46,7 @@ resource loadbalancer 'Microsoft.Network/loadBalancers@2021-02-01' = {
     fwdervm1
     fwdervm2
   ]
-  location: resourceGroup().location
+  location: region
   sku: {
     name: 'Standard'
     tier: 'Regional'

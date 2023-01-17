@@ -3,18 +3,20 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
 param laworkspaceId string
+param region string = resourceGroup().location
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
   params: {
     nameModifier: nameModifier
     isFirewall: true
+    region: region
   }
 }
 
 resource fwpubip 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
   name: '${nameModifier}-fwpubip'
-  location: resourceGroup().location
+  location: region
   properties: {
     publicIPAllocationMethod:'Static'
     publicIPAddressVersion: 'IPv4'
@@ -26,7 +28,7 @@ resource fwpubip 'Microsoft.Network/publicIPAddresses@2021-02-01' = {
 
 resource firewall 'Microsoft.Network/azureFirewalls@2021-02-01' = {
   name: '${nameModifier}-fw'
-  location: resourceGroup().location
+  location: region
   properties: {
     sku: {
       name: 'AZFW_VNet'

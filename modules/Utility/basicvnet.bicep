@@ -5,10 +5,11 @@ param nameModifier string = 'cuuvnet'
 ])
 param pePolicies string = 'Enabled'
 param isFirewall bool = false
+param region string = resourceGroup().location
 
 resource testVnet 'Microsoft.Network/virtualNetworks@2020-08-01'= {
   name: '${nameModifier}-vnet'
-  location: resourceGroup().location
+  location: region
   properties: {
     addressSpace: {
       addressPrefixes: [

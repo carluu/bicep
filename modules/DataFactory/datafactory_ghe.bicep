@@ -1,8 +1,9 @@
 param nameModifier string = 'cuubc'
+param region string = resourceGroup().location
 
 resource adf 'Microsoft.DataFactory/factories@2018-06-01' = {
   name: '${nameModifier}-adf'
-  location: resourceGroup().location
+  location: region
   properties: {
     repoConfiguration: {
       type: 'FactoryGitHubConfiguration'

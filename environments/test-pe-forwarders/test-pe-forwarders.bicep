@@ -1,12 +1,13 @@
 var nameModifier = 'cuupefwd'
 param vmpass string
+param region string = resourceGroup().location
 
 
 // Client networking
 // ***********************************************************************************************
 resource clientVnet 'Microsoft.Network/virtualNetworks@2020-08-01'= {
   name: '${nameModifier}-clientvnet'
-  location: resourceGroup().location
+  location: region
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -39,7 +40,7 @@ resource clientPeSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' =
 // ***********************************************************************************************
 resource fwderVnet 'Microsoft.Network/virtualNetworks@2020-08-01'= {
   name: '${nameModifier}-fwdervnet'
-  location: resourceGroup().location
+  location: region
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -71,7 +72,7 @@ resource fwderPeSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-08-01' = 
 // ***********************************************************************************************
 resource targetVnet 'Microsoft.Network/virtualNetworks@2020-08-01'= {
   name: '${nameModifier}-targetvnet'
-  location: resourceGroup().location
+  location: region
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -98,6 +99,7 @@ module clientVm '../../modules/VM/basic_ubuntu_vm.bicep' = {
     nameModifier: '${nameModifier}client'
     pubip: true
     subnetId: clientSubnet.id
+    region: region
   }
 }
 
@@ -109,6 +111,7 @@ module fwder '../../modules/PrivateLinkForwarder/privatelink-fwder-full.bicep' =
     lbport: 443
     vmpass: vmpass
     subnetId: fwderSubnet.id
+    region: region
   }
 }
 

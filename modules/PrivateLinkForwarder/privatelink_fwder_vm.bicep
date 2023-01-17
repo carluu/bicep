@@ -5,6 +5,7 @@ param scriptsrcport int = 1433
 param scriptdestport int = 1433
 param scriptip string = '10.10.10.10'
 param pubip bool = true
+param region string = resourceGroup().location
 
 var scripturl = 'https://raw.githubusercontent.com/carluu/bicep/main/modules/PrivateLinkForwarder/privatelink_fwder_vm_script.sh'
 
@@ -13,12 +14,13 @@ module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
   params: {
     nameModifier: nameModifier
+    region: region
   }
 }
 
 resource publicip 'Microsoft.Network/publicIPAddresses@2021-02-01' = if(pubip) {
   name: '${nameModifier}pubip'
-  location: resourceGroup().location
+  location: region
   sku: {
     name: 'Basic'
     tier: 'Regional'
@@ -31,7 +33,7 @@ resource publicip 'Microsoft.Network/publicIPAddresses@2021-02-01' = if(pubip) {
 
 resource fwdernic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
   name: '${nameModifier}nic'
-  location: resourceGroup().location
+  location: region
   properties: {
     enableAcceleratedNetworking: false
     ipConfigurations: [
@@ -53,7 +55,7 @@ resource fwdernic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
 
 resource fwdervm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
   name: '${nameModifier}vm'
-  location: resourceGroup().location
+  location: region
   properties: {
     hardwareProfile: {
       vmSize: 'Standard_B2ms'
@@ -87,7 +89,7 @@ resource fwdervm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
   }
   resource fwderscript 'extensions' = {
     name: '${nameModifier}fwderscript'
-    location: resourceGroup().location
+    location: region
     properties: {
       publisher: 'Microsoft.Azure.Extensions'
       type: 'CustomScript'
