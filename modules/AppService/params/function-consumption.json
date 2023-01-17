@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "nameModifier": {
-        "value": "cuufunctionbc"
+        "value": "cuuazurelimits"
       },
       "repoUrl": {
         "value": "https://github.com/carluu/azure-limits"
