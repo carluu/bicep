@@ -1,10 +1,12 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
+@secure()
 param vmpass string
 param scriptsrcport int = 1433
 param scriptdestport int = 1433
 param scriptip string = '10.10.10.10'
 param pubip bool = true
+param adminun string = 'cuuadmin'
 param region string = resourceGroup().location
 
 var scripturl = 'https://raw.githubusercontent.com/carluu/bicep/main/modules/PrivateLinkForwarder/privatelink_fwder_vm_script.sh'
@@ -41,7 +43,7 @@ resource fwdernic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+            id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
           }
           publicIPAddress: pubip ? {
             id: publicip.id
@@ -61,7 +63,7 @@ resource fwdervm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
       vmSize: 'Standard_B2ms'
     }
     osProfile: {
-      adminUsername: 'cuuadmin'
+      adminUsername: adminun
       adminPassword: vmpass
       computerName: '${nameModifier}vm'
     }

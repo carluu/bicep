@@ -1,5 +1,6 @@
 param nameModifier string = 'cuubc'
 param subnetId string = ''
+@secure()
 param vmpass string
 param lbport int = 1433
 param region string = resourceGroup().location
@@ -18,7 +19,7 @@ module fwdervm1 'privatelink_fwder_vm.bicep' = {
     nameModifier: '${nameModifier}1'
     pubip: false
     vmpass: vmpass
-    subnetId: '${subnetId == '' ? basevnet.outputs.subnetId : subnetId}'
+    subnetId: subnetId == '' ? basevnet.outputs.subnetId : subnetId
     scriptdestport: lbport
     scriptsrcport: lbport
     scriptip: '10.10.10.10'
@@ -32,7 +33,7 @@ module fwdervm2 'privatelink_fwder_vm.bicep' = {
     nameModifier: '${nameModifier}2'
     pubip: false
     vmpass: vmpass
-    subnetId: '${subnetId == '' ? basevnet.outputs.subnetId : subnetId}'
+    subnetId: subnetId == '' ? basevnet.outputs.subnetId : subnetId
     scriptdestport: lbport
     scriptsrcport: lbport
     scriptip: '10.10.10.10'
@@ -59,7 +60,7 @@ resource loadbalancer 'Microsoft.Network/loadBalancers@2021-02-01' = {
             privateIPAddressVersion: 'IPv4'
             privateIPAllocationMethod: 'Dynamic'
             subnet: {
-              id: '${subnetId == '' ? basevnet.outputs.subnetId : subnetId}'
+              id: subnetId == '' ? basevnet.outputs.subnetId : subnetId
             }
           }
         }

@@ -38,7 +38,7 @@ resource appgw 'Microsoft.Network/applicationGateways@2020-11-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId }'
+            id: subnetId == '' ? testVnet.outputs.subnetId : subnetId 
           }
         }
       }

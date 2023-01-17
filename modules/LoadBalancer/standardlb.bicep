@@ -25,7 +25,7 @@ resource loadbalancer 'Microsoft.Network/loadBalancers@2021-02-01' = {
             privateIPAddressVersion: 'IPv4'
             privateIPAllocationMethod: 'Static'
             subnet: {
-              id: '${subnetId == '' ? basevnet.outputs.subnetId : subnetId}'
+              id: subnetId == '' ? basevnet.outputs.subnetId : subnetId
             }
           }
         }

@@ -19,7 +19,7 @@ resource testAse 'Microsoft.Web/hostingEnvironments@2021-01-01' = {
     //zoneRedundant: false
     internalLoadBalancingMode: 'Web, Publishing'
     virtualNetwork: {
-      id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+      id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
     }    
   }
 }

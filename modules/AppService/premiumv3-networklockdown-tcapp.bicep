@@ -60,7 +60,7 @@ resource webapp 'Microsoft.Web/sites@2021-02-01' = {
   kind: 'app'
   properties: {
     serverFarmId: asp.id
-    virtualNetworkSubnetId: '${egressSubnetId == '' ? egresssubnet.id : egressSubnetId}'
+    virtualNetworkSubnetId: egressSubnetId == '' ? egresssubnet.id : egressSubnetId
   }
   resource webconfig 'config@2021-02-01' = {
     name: 'web'
@@ -77,7 +77,7 @@ resource webapppe 'Microsoft.Network/privateEndpoints@2021-05-01' = {
   location: region
   properties: {
     subnet: {
-       id: '${peSubnetId == '' ? pesubnet.id : peSubnetId}'
+       id: peSubnetId == '' ? pesubnet.id : peSubnetId
     }
     privateLinkServiceConnections: [
       {

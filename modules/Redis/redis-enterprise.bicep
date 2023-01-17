@@ -1,3 +1,5 @@
+param region string = resourceGroup().location
+
 resource redis 'Microsoft.Cache/redisEnterprise@2021-03-01' = {
   properties: {
     minimumTlsVersion: '1.2'
@@ -10,7 +12,8 @@ resource redis 'Microsoft.Cache/redisEnterprise@2021-03-01' = {
     '3'
   ]
   name: 'cuutestredis'
-  location: 'centralus'
+  location: region
+
   resource redisdb 'databases@2021-02-01-preview' = {
     name: 'redisdb'
     properties: {

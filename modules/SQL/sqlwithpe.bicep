@@ -1,5 +1,6 @@
 var nameModifier = 'sqlwithpe'
 param subnetId string = ''
+@secure()
 param adminPassword string
 param region string = resourceGroup().location
 
@@ -8,6 +9,7 @@ module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   params: {
     nameModifier: '${nameModifier}sql'
     pePolicies: 'Disabled'
+    region: region
   }
 }
 
@@ -16,7 +18,7 @@ resource testPeForSql 'Microsoft.Network/privateEndpoints@2020-11-01' = {
   location: region
   properties: {
     subnet: {
-      id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+      id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
     }
     privateLinkServiceConnections: [
       {

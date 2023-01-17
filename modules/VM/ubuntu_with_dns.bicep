@@ -1,16 +1,19 @@
 // Use AZ VM Image List for easiest way to get list of core images
 param nameModifier string = 'cuubc'
 param subnetId string = ''
+@secure()
 param vmpass string
 param pubip bool = true
 param vmsize string = 'Standard_B2ms'
 param accelNet bool = false
+param adminun string = 'cuuadmin'
 param region string = resourceGroup().location
 
 
 module testVnet '../Utility/basicvnet.bicep' = if(subnetId == ''){
   name: 'testvnet'
   params: {
+    region: region
     nameModifier: '${nameModifier}ubu'
   }
 }
@@ -38,7 +41,7 @@ resource fwdernic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+            id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
           }
           publicIPAddress: pubip ? {
             id: publicip.id
@@ -63,7 +66,7 @@ resource fwdervm 'Microsoft.Compute/virtualMachines@2021-04-01' = {
       vmSize: vmsize
     }
     osProfile: {
-      adminUsername: 'cuuadmin'
+      adminUsername: adminun
       adminPassword: vmpass
       computerName: '${nameModifier}vm'
     }

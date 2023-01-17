@@ -39,7 +39,7 @@ resource firewall 'Microsoft.Network/azureFirewalls@2021-02-01' = {
         name: 'ipconfig1'
         properties: {
           subnet: {
-            id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+            id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
           }
           publicIPAddress: {
             id: fwpubip.id

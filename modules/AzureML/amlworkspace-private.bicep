@@ -107,7 +107,7 @@ resource workspacePe 'Microsoft.Network/privateEndpoints@2021-03-01' = {
       }
     ]
     subnet: {
-      id: '${subnetId == '' ? testVnet.outputs.subnetId : subnetId}'
+      id: subnetId == '' ? testVnet.outputs.subnetId : subnetId
     }
   }
 }
@@ -125,7 +125,7 @@ resource wokspaceDnsApiLink 'Microsoft.Network/privateDnsZones/virtualNetworkLin
   ]
   properties: {
     virtualNetwork: {
-      id: '${vnetId == '' ? testVnet.outputs.vnetId : vnetId}'
+      id: vnetId == '' ? testVnet.outputs.vnetId : vnetId
     }
     registrationEnabled: false
   }  
@@ -144,7 +144,7 @@ resource workspaceDnsNbLink 'Microsoft.Network/privateDnsZones/virtualNetworkLin
   ]
   properties: {
     virtualNetwork: {
-      id: '${vnetId == '' ? testVnet.outputs.vnetId : vnetId}'
+      id: vnetId == '' ? testVnet.outputs.vnetId : vnetId
     }
     registrationEnabled: false
   }
@@ -170,7 +170,3 @@ resource workspaceDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGro
   }
 }
 
-
-// resource asd 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
-  
-// }
